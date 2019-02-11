@@ -23,18 +23,15 @@ fichier.close()
 data = json.loads(r.content)    #   le resultat de la requête est mis dans un dictionnaire Python
 #print(json.dumps(data, indent=4,sort_keys=True))
 mes=''   #  message d'alerte
-#  Affichage des données du jours à 0600 UTC
-heure=data["hourly"]["data"][0]["time"]
-if ((heure-21600)%86400)==0:  # il est 0600 UTC
+heure=data["hourly"]["data"][0]["time"]  #  Affichage des données du jour à 0600 UTC
+if ((heure-21600)%86400)==0:  # il est 0600 UTC:
     today=data["daily"]["data"][0]
-    mes=mes+"Il est 0600 UTC. Ajourd'hui : "+today["summary"]+"\n"
-    
-    
-    mes=mes+"Tmin: "+today["temperatureMin"]+"  Tmax: "+today["temperatureMax"]+"\n"
-    mes=mes+"% précipitation: "+today["precipProbability"] +"  type: "+today["precipType"]+"\n"
+    mes=mes+"Il est 0600 UTC. Aujourd'hui : "+today["summary"]+"\n"
+    mes=mes+"Tmin: "+str(today["temperatureMin"])+"  Tmax: "+str(today["temperatureMax"])+"\n"
+    mes=mes+"% precipitation: "+str(today["precipProbability"]) +"  type: "+today["precipType"]+"\n"
 currently=data["currently"]   # détection d'orage à proximité
 if "nearestStormDistance" in currently :
-    mes=mes+"nearestStormDistance : "+currently["nearestStormDistance"]+" bearing : "+currently["nearestStormBearing"]+" degres \n"
+    mes=mes+"nearestStormDistance : "+str(currently["nearestStormDistance"])+" bearing : "+str(currently["nearestStormBearing"])+" degres \n"
 for i in range(len(data["hourly"]["data"])):   #  boucle sur les blocs horaires du résultat
     hourly=data["hourly"]["data"][i]
     ch=chaineUTCFromTs(hourly["time"])
@@ -45,7 +42,7 @@ for i in range(len(data["hourly"]["data"])):   #  boucle sur les blocs horaires 
     if not(-3<=t<=28) :
         mes=mes+ch+" température = "+str(t)+" °C"+"\n"           #  alerte sur la température
     if (("precipIntensity" in hourly) and (hourly['precipIntensity']>=2)) :     #  alerte sur l'intensité des précipitations
-        mes=mes+ch+" intensité de précipitation = "+str(hourly['precipIntensity'])+" mm/h"+"\n"
+        mes=mes+ch+" intensity of precipitation = "+str(hourly['precipIntensity'])+" mm/h"+"\n"
     
     if (("precipType" in hourly) and ((hourly['precipType']=="snow")or(hourly['precipType']=="sleet"))) :     #  alerte sur la neige
         mes=mes+ch+" type de précipitation = "+str(hourly['precipType'])+"\n"
