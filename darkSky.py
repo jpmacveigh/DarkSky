@@ -26,9 +26,13 @@ mes=''   #  message d'alerte
 heure=data["hourly"]["data"][0]["time"]  #  Affichage des données du jour à 0600 UTC
 if ((heure-21600)%86400)==0:  # il est 0600 UTC:
     today=data["daily"]["data"][0]
-    mes=mes+"Il est 0600 UTC. Aujourd'hui : "+today["summary"]+"\n"
+    mes=mes+"Il est 0600 UTC. Aujourd'hui : "+today["summary"].encode('utf8')+"\n"
     mes=mes+"Tmin: "+str(today["temperatureMin"])+"  Tmax: "+str(today["temperatureMax"])+"\n"
-    mes=mes+"% precipitation: "+str(today["precipProbability"]) +"  type: "+today["precipType"]+"\n"
+    mes=mes+"% precipitation: "+str(today["precipProbability"])
+    if ("precipType" in data) :
+        mes = mes +"  type: "+today["precipType"]+"\n"
+    else:
+        mes=mes+"\n"
 currently=data["currently"]   # détection d'orage à proximité
 if "nearestStormDistance" in currently :
     mes=mes+"nearestStormDistance : "+str(currently["nearestStormDistance"])+" bearing : "+str(currently["nearestStormBearing"])+" degres \n"
@@ -47,9 +51,9 @@ for i in range(len(data["hourly"]["data"])):   #  boucle sur les blocs horaires 
     if (("precipType" in hourly) and ((hourly['precipType']=="snow")or(hourly['precipType']=="sleet"))) :     #  alerte sur la neige
         mes=mes+ch+" type de précipitation = "+str(hourly['precipType'])+"\n"
         
-    print ch,hourly["temperature"],hourly["windGust"],hourly['precipProbability'],hourly["precipIntensity"],hourly['cloudCover'],hourly['summary']
+    print (ch,hourly["temperature"],hourly["windGust"],hourly['precipProbability'],hourly["precipIntensity"],hourly['cloudCover'],hourly['summary'].encode('utf8'))
 
-print "message d'alerte = \n" + mes
+print ("message d'alerte = \n" + mes)
 
 if not(mes==""):
     def sendMailToMe (sujet,message):
